@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      hostNetwork: true
+      containers:
+        - name: ollama
+          image: quay.io/wongchar/llm-demo:llama3.2 # 3B param
+          ports:
+            - containerPort: 11434
+              hostPort: 11434
+          env:
+            - name: OLLAMA_HOST
+              value: "0.0.0.0"
+            - name: OLLAMA_PORT
+              value: "11434"
+            - name: OLLAMA_MODELS
+              value: ""
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+      volumes:
+        - name: ollama-data
+          hostPath:
+            path: /mnt/ollama
+

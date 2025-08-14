@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openwebui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openwebui
+  template:
+    metadata:
+      labels:
+        app: openwebui
+    spec:
+      hostNetwork: true
+      containers:
+        - name: openwebui
+          image: ghcr.io/open-webui/open-webui:main
+          ports:
+            - containerPort: 8080
+              hostPort: 8080
+          env:
+            - name: OLLAMA_BASE_URL
+              value: "http://10.216.188.16:11434"
+          volumeMounts:
+            - name: openwebui-data
+              mountPath: /app/backend/data
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: openwebui-data
+          hostPath:
+            path: /mnt/webui
